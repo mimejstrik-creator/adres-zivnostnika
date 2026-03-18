@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Adresář Živnostníka</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Adresář">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0070f3">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230070f3'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' font-family='system-ui' fill='white'%3E👷%3C/text%3E%3C/svg%3E">
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Adres%C3%A1%C5%99%20%C5%BDivnostn%C3%ADka%22%2C%22short_name%22%3A%22Adres%C3%A1%C5%99%22%2C%22description%22%3A%22Evidence%20z%C3%A1kazn%C3%ADk%C5%AF%20a%20proveден%C3%BDch%20prac%C3%AD%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%230070f3%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D'http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg'%2520viewBox%253D'0%25200%2520512%2520512'%253E%253Crect%2520width%253D'512'%2520height%253D'512'%2520rx%253D'112'%2520fill%253D'%25230070f3'%252F%253E%253Ctext%2520x%253D'256'%2520y%253D'340'%2520font-size%253D'280'%2520text-anchor%253D'middle'%2520font-family%253D'system-ui'%2520fill%253D'white'%253E%25F0%259F%2591%25B7%253C%252Ftext%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8f7f4;
+            --bg-card: #ffffff;
+            --fg: #1a1a2e;
+            --muted: #7c7c8a;
+            --border: #e8e6e1;
+            --accent: #e8611a;
+            --accent-hover: #d0521a;
+            --accent-fg: #ffffff;
+            --accent-soft: #fff3ed;
+            --surface: #f1efe9;
+            --surface-hover: #e8e6e0;
+            --header-bg: #1a1a2e;
+            --header-fg: #ffffff;
+            --status-done: #64748b; --status-done-bg: #f1f5f9;
+            --status-invoiced: #d97706; --status-invoiced-bg: #fffbeb;
+            --status-paid: #059669; --status-paid-bg: #ecfdf5;
+            --overlay: rgba(15,15,30,0.6);
+            --radius: 10px; --radius-lg: 16px; --radius-xl: 20px;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow: 0 4px 16px rgba(0,0,0,0.08);
+            --font: 'Outfit', -apple-system, sans-serif;
+        }
+        .dark {
+            --bg: #111118;
+            --bg-card: #1c1c26;
+            --fg: #f0eff8;
+            --muted: #8888a0;
+            --border: #2a2a38;
+            --accent: #f0722a;
+            --accent-hover: #e8611a;
+            --accent-soft: #2a1a0e;
+            --surface: #18181f;
+            --surface-hover: #222230;
+            --header-bg: #0d0d15;
+            --header-fg: #f0eff8;
+            --status-done-bg: #1e2535; --status-invoiced-bg: #2d1f08; --status-paid-bg: #072a1e;
+            --overlay: rgba(0,0,0,0.8);
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
+            --shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        body { font-family: var(--font); background: var(--bg); color: var(--fg); line-height: 1.5; overflow-x: hidden; }
+
+        /* HEADER */
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--header-bg);
+            padding: 0 1.25rem;
+            height: 58px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-brand { display: flex; align-items: center; gap: 0.625rem; }
+        .header-logo {
+            width: 30px; height: 30px; border-radius: 8px;
+            background: var(--accent); display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        header h1 { font-size: 1.0625rem; font-weight: 600; color: var(--header-fg); letter-spacing: -0.01em; }
+        .header-actions { display: flex; align-items: center; gap: 0.5rem; }
+        #btn-back {
+            background: rgba(255,255,255,0.1); border: none; color: var(--header-fg);
+            width: 34px; height: 34px; border-radius: 8px; cursor: pointer;
+            font-size: 1.125rem; display: none; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        #btn-back:hover { background: rgba(255,255,255,0.18); }
+        #btn-back.visible { display: flex; }
+
+        /* MAIN */
+        main { padding: 1.25rem; max-width: 820px; margin: 0 auto; padding-bottom: 6rem; }
+        .view { display: none; } .view.active { display: block; animation: fadeUp 0.2s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* BUTTONS */
+        .btn {
+            appearance: none; background: var(--bg-card); border: 1.5px solid var(--border);
+            color: var(--fg); padding: 0.5rem 1rem; border-radius: var(--radius);
+            font-size: 0.8125rem; font-weight: 500; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.375rem;
+            transition: all 0.15s; font-family: var(--font); letter-spacing: -0.01em;
+        }
+        .btn:hover { background: var(--surface-hover); border-color: var(--muted); }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary {
+            background: var(--accent); color: var(--accent-fg);
+            border-color: var(--accent); font-weight: 600;
+        }
+        .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+        .btn-header {
+            background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.2);
+            color: white; padding: 0.4rem 0.875rem; border-radius: var(--radius);
+            font-size: 0.8125rem; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            transition: all 0.15s; font-family: var(--font);
+        }
+        .btn-header:hover { background: rgba(255,255,255,0.2); }
+        .btn-danger { color: #dc2626; border-color: #fecaca; }
+        .btn-danger:hover { background: #fef2f2; border-color: #fca5a5; }
+        .dark .btn-danger { border-color: #7f1d1d; }
+        .dark .btn-danger:hover { background: #1c0404; }
+        .btn-sm { padding: 0.3rem 0.625rem; font-size: 0.75rem; }
+        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+        /* FORMS */
+        .form-group { margin-bottom: 1.125rem; }
+        .form-group label {
+            display: block; font-size: 0.8125rem; font-weight: 600;
+            color: var(--muted); margin-bottom: 0.375rem; letter-spacing: 0.01em;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; }
+        .form-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"],
+        textarea, select {
+            width: 100%; padding: 0.6875rem 0.875rem; border-radius: var(--radius);
+            border: 1.5px solid var(--border); background: var(--bg-card); color: var(--fg);
+            font-size: 0.9375rem; font-family: var(--font); transition: border-color 0.15s;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+        textarea { resize: vertical; min-height: 80px; }
+
+        /* SEARCH */
+        .search-wrap { position: relative; margin-bottom: 1rem; }
+        .search-icon { position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 1rem; pointer-events: none; }
+        .search-bar {
+            width: 100%; padding: 0.75rem 0.875rem 0.75rem 2.5rem;
+            border-radius: var(--radius); border: 1.5px solid var(--border);
+            background: var(--bg-card); color: var(--fg); font-size: 0.9375rem;
+            font-family: var(--font); transition: border-color 0.15s;
+            box-shadow: var(--shadow-sm);
+        }
+        .search-bar:focus { outline: none; border-color: var(--accent); }
+        .search-bar::placeholder { color: var(--muted); }
+
+        /* CUSTOMER CARDS */
+        .customer-card {
+            padding: 1rem 1.125rem;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.625rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex; align-items: center; gap: 0.875rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .customer-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-1px); }
+        .customer-card:active { transform: scale(0.99); }
+        .customer-avatar {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: var(--accent-soft); color: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9375rem; font-weight: 700; flex-shrink: 0; letter-spacing: -0.02em;
+        }
+        .dark .customer-avatar { background: var(--accent-soft); color: #f0722a; }
+        .customer-card-body { flex: 1; min-width: 0; }
+        .customer-card h3 { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .customer-card p { font-size: 0.8125rem; color: var(--muted); margin-top: 0.125rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .customer-card .jobs-count {
+            font-size: 0.6875rem; font-weight: 600; color: var(--accent);
+            background: var(--accent-soft); padding: 0.25rem 0.625rem;
+            border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+        }
+
+        /* SECTION HEADERS */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.875rem;
+        }
+        .section-label {
+            font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--muted);
+        }
+
+        /* DETAIL */
+        .detail-section { margin-bottom: 1.75rem; }
+        .detail-card {
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);
+        }
+        .detail-field { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); gap: 1rem; }
+        .detail-field:last-child { border-bottom: none; }
+        .detail-field .label { font-size: 0.8125rem; color: var(--muted); flex-shrink: 0; }
+        .detail-field .value { font-size: 0.875rem; font-weight: 500; text-align: right; }
+        .detail-field .value a { color: var(--accent); text-decoration: none; }
+
+        /* CUSTOMER HEADER IN DETAIL */
+        .customer-detail-header {
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.25rem;
+            margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .customer-detail-avatar {
+            width: 56px; height: 56px; border-radius: 14px;
+            background: var(--accent); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.375rem; font-weight: 700; flex-shrink: 0;
+        }
+        .customer-detail-name { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+        .customer-detail-sub { font-size: 0.875rem; color: var(--muted); margin-top: 0.125rem; }
+
+        /* STATUS */
+        .status { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+        .status::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+        .status-done { background: var(--status-done-bg); color: var(--status-done); }
+        .status-invoiced { background: var(--status-invoiced-bg); color: var(--status-invoiced); }
+        .status-paid { background: var(--status-paid-bg); color: var(--status-paid); }
+
+        /* WORK CARDS */
+        .work-card {
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg); padding: 0.875rem 1rem;
+            margin-bottom: 0.625rem; box-shadow: var(--shadow-sm);
+            border-left: 3px solid var(--border);
+        }
+        .work-card.status-done-card { border-left-color: var(--status-done); }
+        .work-card.status-invoiced-card { border-left-color: var(--status-invoiced); }
+        .work-card.status-paid-card { border-left-color: var(--status-paid); }
+        .work-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .work-card-header .date { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+        .work-card .desc { font-size: 0.9375rem; font-weight: 500; }
+        .work-card .price { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent); margin-top: 0.375rem; }
+        .work-card-actions { display: flex; gap: 0.375rem; margin-top: 0.625rem; }
+
+        /* PHOTO GRID */
+        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.625rem; }
+        .photo-item {
+            aspect-ratio: 1; border-radius: var(--radius); overflow: hidden; cursor: pointer;
+            border: 1.5px solid var(--border); position: relative;
+            transition: transform 0.15s; box-shadow: var(--shadow-sm);
+        }
+        .photo-item:hover { transform: scale(1.02); }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-item .delete-photo {
+            position: absolute; top: 5px; right: 5px; width: 26px; height: 26px;
+            border-radius: 50%; background: rgba(0,0,0,0.65); color: white; border: none;
+            font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.15s;
+        }
+        .photo-item:hover .delete-photo { opacity: 1; }
+
+        /* LIGHTBOX */
+        .lightbox {
+            display: none; position: fixed; inset: 0; z-index: 1000;
+            background: var(--overlay); align-items: center; justify-content: center;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox img { max-width: 95vw; max-height: 90vh; border-radius: var(--radius-lg); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .lightbox-close {
+            position: absolute; top: 1rem; right: 1rem; width: 44px; height: 44px;
+            border-radius: 50%; background: rgba(255,255,255,0.15); color: white; border: 1.5px solid rgba(255,255,255,0.2);
+            font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        /* DARK TOGGLE */
+        .dark-toggle {
+            width: 34px; height: 34px; border-radius: 8px;
+            background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2);
+            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px;
+            transition: background 0.15s;
+        }
+        .dark-toggle:hover { background: rgba(255,255,255,0.18); }
+
+        /* MISC */
+        .empty { text-align: center; color: var(--muted); margin-top: 4rem; }
+        .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        .empty p { font-size: 0.9375rem; }
+        .toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .notes-box {
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1rem; font-size: 0.9375rem;
+            white-space: pre-wrap; min-height: 40px; color: var(--fg);
+            box-shadow: var(--shadow-sm); line-height: 1.6;
+        }
+        .toast {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+            background: var(--fg); color: var(--bg); padding: 0.75rem 1.375rem;
+            border-radius: 999px; font-size: 0.875rem; font-weight: 600;
+            z-index: 2000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2); white-space: nowrap;
+        }
+        .toast.show { opacity: 1; }
+        .confirm-overlay {
+            display: none; position: fixed; inset: 0; z-index: 1500;
+            background: var(--overlay); align-items: center; justify-content: center;
+        }
+        .confirm-overlay.active { display: flex; }
+        .confirm-box {
+            background: var(--bg-card); border: 1.5px solid var(--border); border-radius: var(--radius-xl);
+            padding: 2rem; max-width: 320px; width: 90%; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .confirm-box p { margin-bottom: 1.25rem; font-size: 1rem; font-weight: 500; }
+        .confirm-box .btn-group { justify-content: center; }
+        .file-input { display: none; }
+        @media (max-width: 480px) {
+            .form-row { grid-template-columns: 1fr; }
+            .photo-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-brand">
+            <button id="btn-back" title="Zpět">←</button>
+            <div class="header-logo">🏠</div>
+            <h1 id="app-title">Zákazníci</h1>
+        </div>
+        <div class="header-actions">
+            <button class="dark-toggle" id="dark-btn" title="Tmavý režim">🌙</button>
+            <button class="btn-header" id="btn-add-top">+ Nový</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="view-list" class="view active">
+            <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-bar" placeholder="Hledat jméno, město, práci..." id="search-input">
+            </div>
+            <div class="toolbar">
+                <button class="btn btn-sm" id="btn-export-all">📤 Export JSON</button>
+                <button class="btn btn-sm" id="btn-import-trigger">📥 Import JSON</button>
+                <input type="file" id="import-file" class="file-input" accept=".json">
+            </div>
+            <div id="customer-container"></div>
+        </section>
+
+        <section id="view-detail" class="view">
+            <div id="detail-content"></div>
+        </section>
+
+        <section id="view-form" class="view">
+            <h2 id="form-title" class="form-title">Nový zákazník</h2>
+            <div id="customer-form-wrap">
+                <input type="hidden" id="f-id">
+                <div class="form-group">
+                    <label>Jméno / firma *</label>
+                    <input type="text" id="f-name">
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Telefon</label><input type="tel" id="f-phone"></div>
+                    <div class="form-group"><label>E-mail</label><input type="text" id="f-email"></div>
+                </div>
+                <div class="form-group"><label>Ulice</label><input type="text" id="f-street"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Město</label><input type="text" id="f-city"></div>
+                    <div class="form-group"><label>PSČ</label><input type="text" id="f-zip"></div>
+                </div>
+                <div class="form-group"><label>Poznámky</label><textarea id="f-notes"></textarea></div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btn-save-customer">Uložit</button>
+                    <button class="btn" id="btn-cancel-customer">Zrušit</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-work-form" class="view">
+            <h2 class="form-title">Nový záznam práce</h2>
+            <div id="work-form-wrap">
+                <div class="form-group"><label>Datum *</label><input type="date" id="w-date"></div>
+                <div class="form-group"><label>Popis práce *</label><input type="text" id="w-desc"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Cena (Kč)</label><input type="number" id="w-price" min="0" step="1"></div>
+                    <div class="form-group">
+                        <label>Stav</label>
+                        <select id="w-status">
+                            <option value="done">Hotovo</option>
+                            <option value="invoiced">Fakturováno</option>
+                            <option value="paid">Zaplaceno</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btn-save-work">Uložit</button>
+                    <button class="btn" id="btn-cancel-work">Zrušit</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightbox-close">✕</button>
+        <img id="lightbox-img" src="" alt="Náhled">
+    </div>
+    <div class="toast" id="toast"></div>
+    <div class="confirm-overlay" id="confirm-dialog">
+        <div class="confirm-box">
+            <p id="confirm-text"></p>
+            <div class="btn-group">
+                <button class="btn btn-danger" id="confirm-yes">Smazat</button>
+                <button class="btn" id="confirm-no">Zrušit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Utils
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+    function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+    function field(label, value) { return '<div class="detail-field"><span class="label">' + label + '</span><span class="value">' + value + '</span></div>'; }
+    function formatDate(d) { if (!d) return ''; var p = d.split('-'); return p[2] + '.' + p[1] + '.' + p[0]; }
+    function download(name, content) {
+        var a = document.createElement('a');
+        a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(content);
+        a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    var app = {
+        state: { customers: [], selectedId: null, viewStack: ['list'], dark: false },
+
+        init: function() {
+            try {
+                var data = localStorage.getItem('adresar_data');
+                this.state.customers = data ? JSON.parse(data) : [];
+            } catch(e) { this.state.customers = []; }
+
+            this.state.dark = localStorage.getItem('adresar_dark') === '1' ||
+                (!localStorage.getItem('adresar_dark') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (this.state.dark) document.body.classList.add('dark');
+            this.updateDarkBtn();
+            this.renderList();
+            this.bindEvents();
+        },
+
+        bindEvents: function() {
+            var self = this;
+            document.getElementById('btn-back').addEventListener('click', function() { self.goBack(); });
+            document.getElementById('btn-add-top').addEventListener('click', function() { self.showAddCustomer(); });
+            document.getElementById('dark-btn').addEventListener('click', function() { self.toggleDark(); });
+            document.getElementById('search-input').addEventListener('input', function() { self.renderList(this.value); });
+            document.getElementById('btn-export-all').addEventListener('click', function() { self.exportAll(); });
+            document.getElementById('btn-import-trigger').addEventListener('click', function() { document.getElementById('import-file').click(); });
+            document.getElementById('import-file').addEventListener('change', function(e) { self.importAll(e); });
+            document.getElementById('btn-save-customer').addEventListener('click', function() { self.saveCustomer(); });
+            document.getElementById('btn-cancel-customer').addEventListener('click', function() { self.goBack(); });
+            document.getElementById('btn-save-work').addEventListener('click', function() { self.saveWork(); });
+            document.getElementById('btn-cancel-work').addEventListener('click', function() { self.showDetail(self.state.selectedId); });
+            document.getElementById('lightbox').addEventListener('click', function() { self.closeLightbox(); });
+            document.getElementById('lightbox-close').addEventListener('click', function() { self.closeLightbox(); });
+            document.getElementById('confirm-no').addEventListener('click', function() { self.closeConfirm(); });
+
+            // Delegate clicks in detail view
+            document.getElementById('detail-content').addEventListener('click', function(e) {
+                var btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                var action = btn.dataset.action;
+                var id = btn.dataset.id;
+                if (action === 'add-work') self.showAddWork();
+                else if (action === 'add-photo') document.getElementById('photo-input').click();
+                else if (action === 'edit') self.showEditCustomer();
+                else if (action === 'export') self.exportCustomer();
+                else if (action === 'delete-customer') self.confirmDeleteCustomer();
+                else if (action === 'set-status') self.setWorkStatus(id, btn.dataset.status);
+                else if (action === 'delete-work') self.deleteWork(id);
+                else if (action === 'delete-photo') { e.stopPropagation(); self.deletePhoto(parseInt(id)); }
+                else if (action === 'open-lightbox') self.openLightbox(btn.dataset.src);
+            });
+
+            document.getElementById('customer-container').addEventListener('click', function(e) {
+                var card = e.target.closest('[data-customer-id]');
+                if (card) self.showDetail(card.dataset.customerId);
+            });
+        },
+
+        save: function() {
+            try { localStorage.setItem('adresar_data', JSON.stringify(this.state.customers)); }
+            catch(e) { this.toast('Chyba ukládání: úložiště plné'); }
+        },
+
+        showView: function(id) {
+            document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+            document.getElementById('view-' + id).classList.add('active');
+            document.getElementById('btn-back').style.display = id === 'list' ? 'none' : '';
+            document.getElementById('btn-add-top').style.display = id === 'list' ? '' : 'none';
+            var titles = { list: 'Zákazníci', detail: 'Detail', form: 'Zákazník', 'work-form': 'Záznam práce' };
+            document.getElementById('app-title').textContent = titles[id] || 'Adresář';
+        },
+
+        goBack: function() {
+            this.state.viewStack.pop();
+            var prev = this.state.viewStack[this.state.viewStack.length - 1] || 'list';
+            if (prev === 'detail' && this.state.selectedId) {
+                this.showDetail(this.state.selectedId, true);
+            } else {
+                this.showView('list');
+                this.state.viewStack = ['list'];
+                this.renderList();
+            }
+        },
+
+        navigate: function(view) {
+            this.state.viewStack.push(view);
+            this.showView(view);
+        },
+
+        renderList: function(filter) {
+            var c = document.getElementById('customer-container');
+            filter = (filter || document.getElementById('search-input').value || '').toLowerCase();
+            var filtered = this.state.customers.filter(function(x) {
+                return x.name.toLowerCase().indexOf(filter) >= 0 ||
+                    (x.city || '').toLowerCase().indexOf(filter) >= 0 ||
+                    (x.jobs || []).some(function(j) { return j.desc.toLowerCase().indexOf(filter) >= 0; });
+            }).slice().sort(function(a, b) { return a.name.localeCompare(b.name, 'cs'); });
+            if (!filtered.length) {
+                c.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p style="font-size:1rem;font-weight:600;margin-bottom:0.375rem;">Žádní zákazníci</p><p>Přidejte prvního tlačítkem + Nový</p></div>';
+                return;
+            }
+            c.innerHTML = filtered.map(function(x) {
+                var jobCount = (x.jobs || []).length;
+                var lastJob = jobCount ? x.jobs[x.jobs.length - 1].desc : '';
+                var initials = x.name.trim().split(/\s+/).slice(0,2).map(function(w){return w[0].toUpperCase();}).join('');
+                return '<div class="customer-card" data-customer-id="' + x.id + '">' +
+                    '<div class="customer-avatar">' + esc(initials) + '</div>' +
+                    '<div class="customer-card-body"><h3>' + esc(x.name) + '</h3>' +
+                    '<p>' + esc(x.city || '—') + (lastJob ? ' · ' + esc(lastJob) : '') + '</p></div>' +
+                    (jobCount ? '<span class="jobs-count">' + jobCount + ' ' + (jobCount === 1 ? 'práce' : jobCount < 5 ? 'práce' : 'prací') + '</span>' : '') +
+                    '</div></div>';
+            }).join('');
+        },
+
+        showDetail: function(id, noNav) {
+            this.state.selectedId = id;
+            if (!noNav) this.navigate('detail');
+            else this.showView('detail');
+            var c = this.getCustomer(id);
+            if (!c) return;
+            document.getElementById('app-title').textContent = c.name;
+
+            var statusLabels = { done: 'Hotovo', invoiced: 'Fakturováno', paid: 'Zaplaceno' };
+            var jobs = (c.jobs || []).slice().sort(function(a, b) { return b.date.localeCompare(a.date); });
+            var photos = c.photos || [];
+
+            var initials = c.name.trim().split(/\s+/).slice(0,2).map(function(w){return w[0].toUpperCase();}).join('');
+            var addrLine = [c.street, c.city, c.zip].filter(Boolean).join(', ');
+            var html = '<div class="customer-detail-header">' +
+                '<div class="customer-detail-avatar">' + esc(initials) + '</div>' +
+                '<div><div class="customer-detail-name">' + esc(c.name) + '</div>' +
+                (addrLine ? '<div class="customer-detail-sub">📍 ' + esc(addrLine) + '</div>' : '') + '</div>' +
+                '</div>';
+            html += '<div class="detail-section"><div class="detail-card">' +
+                field('Jméno / firma', esc(c.name)) +
+                field('Telefon', c.phone ? '<a href="tel:' + esc(c.phone) + '">' + esc(c.phone) + '</a>' : '—') +
+                field('E-mail', c.email ? '<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a>' : '—') +
+                field('Adresa', (function() {
+                    var addr = [c.street, c.city, c.zip].filter(Boolean).join(', ');
+                    if (!addr) return '—';
+                    var mapsUrl = 'https://mapy.cz/zakladni?q=' + encodeURIComponent(addr);
+                    return esc(addr) + ' <a href="' + mapsUrl + '" target="_blank" style="margin-left:0.5rem;font-size:0.75rem;background:var(--accent);color:white;padding:0.125rem 0.5rem;border-radius:999px;text-decoration:none;white-space:nowrap;">&#128506; Navigovat</a>';
+                })()) +
+                '</div>';
+
+            if (c.notes) {
+                html += '<div class="detail-section"><h2>Poznámky</h2><div class="notes-box">' + esc(c.notes) + '</div></div>';
+            }
+
+            html += '<div class="detail-section">' +
+                '<div class="section-header">' +
+                '<span class="section-label">Historie prací</span>' +
+                '<button class="btn btn-sm" data-action="add-work">+ Přidat</button></div>';
+
+            if (jobs.length) {
+                html += jobs.map(function(j) {
+                    var actions = '';
+                    if (j.status === 'done') actions += '<button class="btn btn-sm" data-action="set-status" data-id="' + j.id + '" data-status="invoiced">→ Fakturováno</button>';
+                    if (j.status === 'invoiced') actions += '<button class="btn btn-sm" data-action="set-status" data-id="' + j.id + '" data-status="paid">→ Zaplaceno</button>';
+                    actions += '<button class="btn btn-sm btn-danger" data-action="delete-work" data-id="' + j.id + '">Smazat</button>';
+                    return '<div class="work-card status-' + j.status + '-card">' +
+                        '<div class="work-card-header"><span class="status status-' + j.status + '">' + (statusLabels[j.status] || j.status) + '</span>' +
+                        '<span class="date">' + formatDate(j.date) + '</span></div>' +
+                        '<div class="desc">' + esc(j.desc) + '</div>' +
+                        (j.price ? '<div class="price">' + Number(j.price).toLocaleString('cs-CZ') + ' Kč</div>' : '') +
+                        '<div class="work-card-actions">' + actions + '</div></div>';
+                }).join('');
+            } else {
+                html += '<p style="color:var(--muted);font-size:0.875rem;">Zatím žádné záznamy.</p>';
+            }
+            html += '</div>';
+
+            html += '<div class="detail-section">' +
+                '<div class="section-header">' +
+                '<span class="section-label">Fotogalerie</span>' +
+                '<span>' +
+                '<button class="btn btn-sm" data-action="add-photo">+ Foto</button>' +
+                '<input type="file" id="photo-input" class="file-input" accept="image/*" multiple></span></div>';
+
+            if (photos.length) {
+                html += '<div class="photo-grid">' + photos.map(function(p, i) {
+                    return '<div class="photo-item" data-action="open-lightbox" data-src="' + i + '">' +
+                        '<img src="' + p + '" alt="Foto">' +
+                        '<button class="delete-photo" data-action="delete-photo" data-id="' + i + '">✕</button></div>';
+                }).join('') + '</div>';
+            } else {
+                html += '<p style="color:var(--muted);font-size:0.875rem;">Žádné fotky.</p>';
+            }
+            html += '</div>';
+
+            html += '<div class="toolbar" style="margin-top:2rem;">' +
+                '<button class="btn btn-sm" data-action="edit">✏️ Upravit</button>' +
+                '<button class="btn btn-sm" data-action="export">📤 Export</button>' +
+                '<button class="btn btn-sm btn-danger" data-action="delete-customer">🗑 Smazat</button></div>';
+
+            document.getElementById('detail-content').innerHTML = html;
+
+            // Bind photo input
+            var photoInput = document.getElementById('photo-input');
+            if (photoInput) {
+                var self = this;
+                photoInput.addEventListener('change', function(e) { self.addPhotos(e); });
+            }
+        },
+
+        showAddCustomer: function() {
+            document.getElementById('form-title').textContent = 'Nový zákazník';
+            document.getElementById('f-id').value = '';
+            document.getElementById('f-name').value = '';
+            document.getElementById('f-phone').value = '';
+            document.getElementById('f-email').value = '';
+            document.getElementById('f-street').value = '';
+            document.getElementById('f-city').value = '';
+            document.getElementById('f-zip').value = '';
+            document.getElementById('f-notes').value = '';
+            this.navigate('form');
+        },
+
+        showEditCustomer: function() {
+            var c = this.getCustomer(this.state.selectedId);
+            if (!c) return;
+            document.getElementById('form-title').textContent = 'Upravit zákazníka';
+            document.getElementById('f-id').value = c.id;
+            document.getElementById('f-name').value = c.name;
+            document.getElementById('f-phone').value = c.phone || '';
+            document.getElementById('f-email').value = c.email || '';
+            document.getElementById('f-street').value = c.street || '';
+            document.getElementById('f-city').value = c.city || '';
+            document.getElementById('f-zip').value = c.zip || '';
+            document.getElementById('f-notes').value = c.notes || '';
+            this.navigate('form');
+        },
+
+        saveCustomer: function() {
+            var name = document.getElementById('f-name').value.trim();
+            if (!name) { this.toast('Vyplňte jméno zákazníka'); return; }
+            var id = document.getElementById('f-id').value || uid();
+            var existing = this.getCustomer(id);
+            var customer = {
+                id: id, name: name,
+                phone: document.getElementById('f-phone').value.trim(),
+                email: document.getElementById('f-email').value.trim(),
+                street: document.getElementById('f-street').value.trim(),
+                city: document.getElementById('f-city').value.trim(),
+                zip: document.getElementById('f-zip').value.trim(),
+                notes: document.getElementById('f-notes').value.trim(),
+                jobs: existing ? existing.jobs : [],
+                photos: existing ? existing.photos : [],
+                created: existing ? existing.created : new Date().toISOString()
+            };
+            if (existing) {
+                var i = this.state.customers.findIndex(function(c) { return c.id === id; });
+                this.state.customers[i] = customer;
+            } else {
+                this.state.customers.push(customer);
+            }
+            this.save();
+            this.toast('Zákazník uložen ✓');
+            this.state.selectedId = id;
+            this.state.viewStack.pop();
+            this.showDetail(id, true);
+        },
+
+        confirmDeleteCustomer: function() {
+            var self = this;
+            this.confirm('Opravdu smazat zákazníka?', function() {
+                self.state.customers = self.state.customers.filter(function(c) { return c.id !== self.state.selectedId; });
+                self.save();
+                self.toast('Zákazník smazán');
+                self.state.viewStack = ['list'];
+                self.showView('list');
+                self.renderList();
+            });
+        },
+
+        showAddWork: function() {
+            document.getElementById('w-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('w-desc').value = '';
+            document.getElementById('w-price').value = '';
+            document.getElementById('w-status').value = 'done';
+            this.navigate('work-form');
+        },
+
+        saveWork: function() {
+            var desc = document.getElementById('w-desc').value.trim();
+            var date = document.getElementById('w-date').value;
+            if (!desc || !date) { this.toast('Vyplňte datum a popis'); return; }
+            var c = this.getCustomer(this.state.selectedId);
+            if (!c) return;
+            if (!c.jobs) c.jobs = [];
+            c.jobs.push({
+                id: uid(), date: date, desc: desc,
+                price: document.getElementById('w-price').value || 0,
+                status: document.getElementById('w-status').value
+            });
+            this.save();
+            this.toast('Záznam přidán ✓');
+            this.state.viewStack.pop();
+            this.showDetail(this.state.selectedId, true);
+        },
+
+        setWorkStatus: function(workId, status) {
+            var c = this.getCustomer(this.state.selectedId);
+            var j = c.jobs.find(function(j) { return j.id === workId; });
+            if (j) { j.status = status; this.save(); this.showDetail(this.state.selectedId, true); }
+        },
+
+        deleteWork: function(workId) {
+            var self = this;
+            this.confirm('Smazat záznam práce?', function() {
+                var c = self.getCustomer(self.state.selectedId);
+                c.jobs = c.jobs.filter(function(j) { return j.id !== workId; });
+                self.save(); self.showDetail(self.state.selectedId, true); self.toast('Smazáno');
+            });
+        },
+
+        addPhotos: function(e) {
+            var c = this.getCustomer(this.state.selectedId);
+            if (!c) return;
+            if (!c.photos) c.photos = [];
+            var files = Array.from(e.target.files);
+            var self = this; var loaded = 0;
+            files.forEach(function(file) {
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    c.photos.push(ev.target.result);
+                    loaded++;
+                    if (loaded === files.length) {
+                        try {
+                            self.save();
+                            self.showDetail(self.state.selectedId, true);
+                            self.toast(files.length + ' foto přidáno ✓');
+                        } catch(err) { c.photos.pop(); self.toast('Úložiště je plné!'); }
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            e.target.value = '';
+        },
+
+        deletePhoto: function(index) {
+            var self = this;
+            this.confirm('Smazat fotku?', function() {
+                var c = self.getCustomer(self.state.selectedId);
+                c.photos.splice(index, 1);
+                self.save(); self.showDetail(self.state.selectedId, true); self.toast('Fotka smazána');
+            });
+        },
+
+        openLightbox: function(index) {
+            var c = this.getCustomer(this.state.selectedId);
+            if (c && c.photos && c.photos[index]) {
+                document.getElementById('lightbox-img').src = c.photos[index];
+                document.getElementById('lightbox').classList.add('active');
+            }
+        },
+
+        closeLightbox: function() { document.getElementById('lightbox').classList.remove('active'); },
+
+        exportAll: function() {
+            download('adresar-zaloha.json', JSON.stringify(this.state.customers, null, 2));
+            this.toast('Záloha exportována ✓');
+        },
+
+        exportCustomer: function() {
+            var c = this.getCustomer(this.state.selectedId);
+            download('zakaznik-' + c.name.replace(/\s+/g, '-') + '.json', JSON.stringify(c, null, 2));
+            this.toast('Exportováno ✓');
+        },
+
+        importAll: function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            var self = this;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                try {
+                    var data = JSON.parse(ev.target.result);
+                    if (Array.isArray(data)) {
+                        var added = 0;
+                        data.forEach(function(item) {
+                            if (item.name && item.id && !self.getCustomer(item.id)) {
+                                self.state.customers.push(item); added++;
+                            }
+                        });
+                        self.save(); self.renderList();
+                        self.toast('Importováno ' + added + ' zákazníků');
+                    } else if (data.name && data.id) {
+                        if (!self.getCustomer(data.id)) {
+                            self.state.customers.push(data); self.save(); self.renderList();
+                            self.toast('Zákazník importován');
+                        } else { self.toast('Zákazník již existuje'); }
+                    }
+                } catch(err) { self.toast('Neplatný soubor'); }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        },
+
+        toggleDark: function() {
+            this.state.dark = !this.state.dark;
+            document.body.classList.toggle('dark', this.state.dark);
+            localStorage.setItem('adresar_dark', this.state.dark ? '1' : '0');
+            this.updateDarkBtn();
+        },
+
+        updateDarkBtn: function() {
+            document.getElementById('dark-btn').textContent = this.state.dark ? '☀️' : '🌙';
+        },
+
+        getCustomer: function(id) { return this.state.customers.find(function(c) { return c.id === id; }); },
+
+        toast: function(msg) {
+            var t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 2000);
+        },
+
+        confirm: function(msg, onYes) {
+            document.getElementById('confirm-text').textContent = msg;
+            document.getElementById('confirm-dialog').classList.add('active');
+            var self = this;
+            document.getElementById('confirm-yes').onclick = function() { self.closeConfirm(); onYes(); };
+        },
+
+        closeConfirm: function() { document.getElementById('confirm-dialog').classList.remove('active'); }
+    };
+
+    app.init();
+    </script>
+
+    <!-- PWA Install banner -->
+    <div id="pwa-banner" style="display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);
+        background:var(--accent);color:white;padding:0.75rem 1.25rem;border-radius:var(--radius-lg);
+        font-size:0.875rem;font-weight:500;z-index:3000;box-shadow:0 4px 16px rgba(0,112,243,0.4);
+        align-items:center;gap:0.75rem;white-space:nowrap;">
+        <span>📲 Přidat na plochu</span>
+        <button id="pwa-install-btn" style="background:white;color:var(--accent);border:none;
+            padding:0.375rem 0.875rem;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.8125rem;">
+            Nainstalovat
+        </button>
+        <button id="pwa-dismiss-btn" style="background:none;border:none;color:rgba(255,255,255,0.8);
+            cursor:pointer;font-size:1.125rem;padding:0 0.25rem;line-height:1;">×</button>
+    </div>
+
+    <script>
+    // Service Worker pro offline použití
+    if ('serviceWorker' in navigator) {
+        var swCode = [
+            'var CACHE = "adresar-v1";',
+            'self.addEventListener("install", function(e) { self.skipWaiting(); });',
+            'self.addEventListener("activate", function(e) { e.waitUntil(clients.claim()); });',
+            'self.addEventListener("fetch", function(e) {',
+            '  e.respondWith(',
+            '    caches.match(e.request).then(function(r) {',
+            '      return r || fetch(e.request).then(function(res) {',
+            '        var clone = res.clone();',
+            '        caches.open(CACHE).then(function(c) { c.put(e.request, clone); });',
+            '        return res;',
+            '      }).catch(function() { return r; });',
+            '    })',
+            '  );',
+            '});'
+        ].join('\n');
+        try {
+            var blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
+        } catch(e) {}
+    }
+
+    // Install prompt
+    var deferredPrompt = null;
+    var pwaBanner = document.getElementById('pwa-banner');
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        pwaBanner.style.display = 'flex';
+    });
+
+    document.getElementById('pwa-install-btn').addEventListener('click', function() {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function() {
+            deferredPrompt = null;
+            pwaBanner.style.display = 'none';
+        });
+    });
+
+    document.getElementById('pwa-dismiss-btn').addEventListener('click', function() {
+        pwaBanner.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', function() {
+        pwaBanner.style.display = 'none';
+        app.toast('Aplikace nainstalována ✓');
+    });
+    </script>
+</body>
+</html>
